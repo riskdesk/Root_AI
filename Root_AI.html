@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meet ROOTY - Your Risk AI Assistant</title>
+    <!-- Tailwind CSS for strict structure -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts for sleek tech aesthetic -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+    <!-- Lucide Icons for contextual banner logos -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #e9ecef; /* Slightly darker background */
+            color: #1f2937;
+            overflow-x: hidden;
+        }
+        h1, h2, h3, .tech-font {
+            font-family: 'Space Grotesk', sans-serif;
+        }
+
+        /* Continuous Floating Animation for Main Header */
+        @keyframes floatHeader {
+            0% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-4px) rotate(-0.2deg); }
+            100% { transform: translateY(0px) rotate(0deg); }
+        }
+        .floating-header {
+            animation: floatHeader 5s ease-in-out infinite;
+            display: inline-block;
+            will-change: transform;
+        }
+
+        /* Glassmorphism & Interactive Banners */
+        .interactive-banner {
+            background: rgba(255, 255, 255, 0.88);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(209, 213, 219, 0.8);
+            transition: all 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+            position: relative;
+            overflow: hidden;
+        }
+        .interactive-banner::before {
+            content: '';
+            position: absolute;
+            top: 0; left: -100%;
+            width: 100%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.45), transparent);
+            transition: all 0.6s ease;
+        }
+        .interactive-banner:hover {
+            transform: translateY(-3px) scale(1.005);
+            background: rgba(255, 255, 255, 0.98);
+            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.05), 0 1px 2px rgba(0,0,0,0.02);
+            border-color: #9ca3af;
+        }
+        .interactive-banner:hover::before {
+            left: 100%;
+        }
+
+        /* Background Canvas Layer */
+        #bg-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .slide-content {
+            position: relative;
+            z-index: 10;
+        }
+        
+        .banner-icon {
+            color: #374151;
+            width: 22px;
+            height: 22px;
+            flex-shrink: 0;
+        }
+
+        /* Rooty Interactive Container Styles */
+        .rooty-wrapper {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            width: 100%;
+            max-width: 520px;
+        }
+
+        .rooty-card {
+            transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1), filter 0.5s ease;
+            filter: drop-shadow(0 15px 25px rgba(0,0,0,0.08));
+            will-change: transform, filter;
+        }
+
+        /* Hover Shine, Scale, and Glow Effects */
+        .rooty-wrapper:hover .rooty-card {
+            transform: scale(1.06) translateY(-8px);
+            filter: drop-shadow(0 20px 35px rgba(56, 189, 248, 0.35)) 
+                    drop-shadow(0 0 25px rgba(129, 140, 248, 0.3));
+        }
+
+        /* Antenna Glitter / Sparkle Animation */
+        .glitter-particle {
+            opacity: 0;
+            transform-origin: center;
+            transition: opacity 0.3s ease;
+        }
+
+        .rooty-wrapper:hover .glitter-particle {
+            opacity: 1;
+            animation: magicSparkle 1.8s infinite ease-in-out;
+        }
+
+        .glitter-particle:nth-child(1) { animation-delay: 0s; }
+        .glitter-particle:nth-child(2) { animation-delay: 0.3s; }
+        .glitter-particle:nth-child(3) { animation-delay: 0.6s; }
+        .glitter-particle:nth-child(4) { animation-delay: 0.9s; }
+        .glitter-particle:nth-child(5) { animation-delay: 1.2s; }
+
+        @keyframes magicSparkle {
+            0% {
+                transform: scale(0.3) translateY(0px) rotate(0deg);
+                opacity: 0.2;
+            }
+            50% {
+                transform: scale(1.2) translateY(-12px) rotate(180deg);
+                opacity: 1;
+            }
+            100% {
+                transform: scale(0.4) translateY(-24px) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        /* Wave animation for Rooty's hand */
+        @keyframes gentleWave {
+            0%, 100% { transform: rotate(0deg); }
+            50% { transform: rotate(-10deg); }
+        }
+        .rooty-hand {
+            transform-origin: 320px 280px;
+            animation: gentleWave 2.8s ease-in-out infinite;
+        }
+
+        /* Pixar-style Eye Blink Animation */
+        @keyframes pixarBlink {
+            0%, 46%, 52%, 100% {
+                transform: scaleY(1);
+            }
+            49% {
+                transform: scaleY(0.08);
+            }
+        }
+
+        .animated-eye {
+            transform-origin: center 298px;
+            animation: pixarBlink 4.5s ease-in-out infinite;
+        }
+    </style>
+</head>
+<body class="h-screen w-screen overflow-hidden">
+
+    <!-- Interactive Geometric & Dynamic Star Motion Background Canvas Layer -->
+    <canvas id="bg-canvas"></canvas>
+
+    <!-- Main Content Container Frame -->
+    <main class="slide-content h-screen w-screen p-8 md:p-12 flex flex-col justify-center box-border">
+
+        <!-- Main Workspace Split Grid -->
+        <div class="grid grid-cols-12 gap-8 items-center w-full max-w-7xl mx-auto">
+            
+            <!-- LEFT SIDE: Centered Header & Interactive Feature Banners (~55% Width) -->
+            <div class="col-span-12 lg:col-span-7 flex flex-col">
+                
+                <!-- Center-Aligned Header Section relative to the banners -->
+                <header class="mb-6 text-center">
+                    <h1 class="floating-header text-4xl md:text-5xl font-bold tracking-tight text-gray-900 leading-none">MEET ROOTY</h1>
+                    <h2 class="text-base md:text-lg font-light text-gray-500 tracking-widest uppercase mt-2">YOUR RISK AI ASSISTANT</h2>
+                </header>
+
+                <div class="space-y-3">
+                    <!-- 4.1 Risk Knowledge & Expertise -->
+                    <div class="interactive-banner p-4 rounded-xl flex items-start gap-4">
+                        <div class="p-2.5 bg-gray-100 rounded-lg">
+                            <i data-lucide="book-open-check" class="banner-icon"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-base font-bold text-gray-900 tech-font mb-0.5">Risk Knowledge & Expertise</h3>
+                            <p class="text-xs md:text-sm text-gray-600 font-light leading-relaxed">
+                                Uses a built-in knowledge base covering fraud, advantage play, bonus abuse, suspicious betting, and gaming-specific risk scenarios.
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- 4.2 Player & Case Investigation -->
+                    <div class="interactive-banner p-4 rounded-xl flex items-start gap-4">
+                        <div class="p-2.5 bg-gray-100 rounded-lg">
+                            <i data-lucide="search-code" class="banner-icon"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-base font-bold text-gray-900 tech-font mb-0.5">Player & Case Investigation</h3>
+                            <p class="text-xs md:text-sm text-gray-600 font-light leading-relaxed">
+                                Analyzes player activity and connects relevant data across the BO to explain what happened, identify potential risks, and guide investigations.
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- 4.3 Risk Interpretation & Classification -->
+                    <div class="interactive-banner p-4 rounded-xl flex items-start gap-4">
+                        <div class="p-2.5 bg-gray-100 rounded-lg">
+                            <i data-lucide="brain-circuit" class="banner-icon"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-base font-bold text-gray-900 tech-font mb-0.5">Risk Interpretation & Classification</h3>
+                            <p class="text-xs md:text-sm text-gray-600 font-light leading-relaxed">
+                                Explains complex alerts and behaviors in simple terms and helps distinguish between fraud, advantage play, bonus abuse, technical issues, and legitimate activity.
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- 4.4 BO Guidance & Investigation Support -->
+                    <div class="interactive-banner p-4 rounded-xl flex items-start gap-4">
+                        <div class="p-2.5 bg-gray-100 rounded-lg">
+                            <i data-lucide="compass" class="banner-icon"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-base font-bold text-gray-900 tech-font mb-0.5">BO Guidance & Investigation Support</h3>
+                            <p class="text-xs md:text-sm text-gray-600 font-light leading-relaxed">
+                                Recommends relevant BO tools, reports, alerts, and filters, while guiding users step-by-step through the investigation process.
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- 4.5 Risk Decision Support -->
+                    <div class="interactive-banner p-4 rounded-xl flex items-start gap-4">
+                        <div class="p-2.5 bg-gray-100 rounded-lg">
+                            <i data-lucide="shield-alert" class="banner-icon"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-base font-bold text-gray-900 tech-font mb-0.5">Risk Decision Support</h3>
+                            <p class="text-xs md:text-sm text-gray-600 font-light leading-relaxed">
+                                Provides contextual insights and recommendations for potential actions such as monitoring, limiting, escalating, or further investigating a player, while leaving the final decision to the risk team.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- RIGHT SIDE: Rooty AI Assistant Asset (~45% Width) -->
+            <div class="col-span-12 lg:col-span-5 h-full flex items-center justify-center min-h-[500px]">
+                <div class="rooty-wrapper" id="rooty-target">
+                    
+                    <!-- SVG Character Rooty -->
+                    <div class="rooty-card w-full flex flex-col items-center">
+                        <svg viewBox="0 0 500 520" class="w-full h-auto max-h-[520px]" xmlns="http://www.w3.org/2000/svg">
+                            <defs>
+                                <!-- Gradient Palette for Text & Accents -->
+                                <linearGradient id="rootyTextGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                                    <stop offset="0%" stop-color="#38bdf8" />
+                                    <stop offset="100%" stop-color="#818cf8" />
+                                </linearGradient>
+
+                                <!-- Body Shading Gradients -->
+                                <linearGradient id="bodyGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+                                    <stop offset="0%" stop-color="#ffffff" />
+                                    <stop offset="75%" stop-color="#f1f5f9" />
+                                    <stop offset="100%" stop-color="#cbd5e1" />
+                                </linearGradient>
+
+                                <linearGradient id="screenGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+                                    <stop offset="0%" stop-color="#0b1329" />
+                                    <stop offset="100%" stop-color="#1e293b" />
+                                </linearGradient>
+
+                                <linearGradient id="eyeOutlineGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                                    <stop offset="0%" stop-color="#38bdf8" />
+                                    <stop offset="100%" stop-color="#0284c7" />
+                                </linearGradient>
+
+                                <linearGradient id="darkLimb" x1="0%" y1="0%" x2="0%" y2="100%">
+                                    <stop offset="0%" stop-color="#5a687c" />
+                                    <stop offset="100%" stop-color="#334155" />
+                                </linearGradient>
+
+                                <linearGradient id="earGradientLeft" x1="0%" y1="0%" x2="100%" y2="0%">
+                                    <stop offset="0%" stop-color="#334155" />
+                                    <stop offset="100%" stop-color="#64748b" />
+                                </linearGradient>
+
+                                <linearGradient id="earGradientRight" x1="0%" y1="0%" x2="100%" y2="0%">
+                                    <stop offset="0%" stop-color="#64748b" />
+                                    <stop offset="100%" stop-color="#334155" />
+                                </linearGradient>
+                            </defs>
+
+                            <!-- TOP GREETING TEXT ABOVE ROOTY'S HEAD -->
+                            <text x="250" y="42" text-anchor="middle" font-family="'Space Grotesk', sans-serif" font-weight="700" font-size="34" fill="url(#rootyTextGrad)">Hello! I'm Rooty.</text>
+
+                            <!-- Magic Antenna Sparkles -->
+                            <g class="glitter-container">
+                                <path class="glitter-particle" d="M 250,55 L 253,65 L 263,68 L 253,71 L 250,81 L 247,71 L 237,68 L 247,65 Z" fill="url(#rootyTextGrad)" />
+                                <path class="glitter-particle" d="M 180,75 L 182,82 L 189,84 L 182,86 L 180,93 L 178,86 L 171,84 L 178,82 Z" fill="url(#rootyTextGrad)" />
+                                <path class="glitter-particle" d="M 320,70 L 322,77 L 329,79 L 322,81 L 320,88 L 318,81 L 311,79 L 318,77 Z" fill="url(#rootyTextGrad)" />
+                                <path class="glitter-particle" d="M 215,50 L 216,55 L 221,56 L 216,57 L 215,62 L 214,57 L 209,56 L 214,55 Z" fill="url(#rootyTextGrad)" />
+                                <path class="glitter-particle" d="M 285,50 L 286,55 L 291,56 L 286,57 L 285,62 L 284,57 L 279,56 L 284,55 Z" fill="url(#rootyTextGrad)" />
+                            </g>
+
+                            <!-- Antenna Sprout & Leaves (Center Top of Head) -->
+                            <g id="antenna">
+                                <path d="M 245,215 C 245,170 255,170 255,215 Z" fill="url(#darkLimb)" />
+                                <!-- Bottom Sprout Leaves -->
+                                <path d="M 250,195 Q 225,180 220,198 Q 238,210 250,195 Z" fill="url(#darkLimb)" />
+                                <path d="M 250,195 Q 275,180 280,198 Q 262,210 250,195 Z" fill="url(#darkLimb)" />
+
+                                <!-- Glowing Crystal Top Leaves -->
+                                <path d="M 250,150 L 275,125 L 250,100 L 225,125 Z" fill="none" stroke="url(#rootyTextGrad)" stroke-width="7" stroke-linejoin="round" />
+                                <path d="M 220,155 L 195,140 L 190,115 L 215,130 Z" fill="none" stroke="url(#rootyTextGrad)" stroke-width="7" stroke-linejoin="round" />
+                                <path d="M 280,155 L 305,140 L 310,115 L 285,130 Z" fill="none" stroke="url(#rootyTextGrad)" stroke-width="7" stroke-linejoin="round" />
+                            </g>
+
+                            <!-- SIDE EARS -->
+                            <!-- Left Ear Knob -->
+                            <rect x="110" y="275" width="28" height="50" rx="14" fill="url(#earGradientLeft)" />
+                            <!-- Right Ear Knob -->
+                            <rect x="362" y="275" width="28" height="50" rx="14" fill="url(#earGradientRight)" />
+
+                            <!-- Bottom Feet -->
+                            <ellipse cx="205" cy="480" rx="26" ry="22" fill="url(#darkLimb)" />
+                            <ellipse cx="295" cy="480" rx="26" ry="22" fill="url(#darkLimb)" />
+
+                            <!-- Left Arm (Resting) -->
+                            <path d="M 132,340 C 105,370 115,440 145,445 C 160,425 155,365 142,340 Z" fill="url(#bodyGrad)" />
+
+                            <!-- Right Arm (Raised Waving Hand) -->
+                            <g class="rooty-hand">
+                                <path d="M 358,320 C 400,290 410,225 380,210 C 355,225 340,280 348,320 Z" fill="url(#bodyGrad)" />
+                            </g>
+
+                            <!-- Main Body & Head Capsule -->
+                            <rect x="125" y="200" width="250" height="270" rx="85" fill="url(#bodyGrad)" />
+
+                            <!-- Face Screen Frame -->
+                            <rect x="155" y="232" width="190" height="150" rx="50" fill="url(#screenGrad)" />
+
+                            <!-- Glowing Eyes with Black Eyeballs & Pixar Blink Animation -->
+                            <g class="animated-eye">
+                                <!-- Left Eye -->
+                                <circle cx="205" cy="298" r="24" fill="none" stroke="url(#eyeOutlineGrad)" stroke-width="5" />
+                                <circle cx="205" cy="298" r="16" fill="#000000" />
+                                <circle cx="198" cy="291" r="6" fill="#ffffff" />
+
+                                <!-- Right Eye -->
+                                <circle cx="295" cy="298" r="24" fill="none" stroke="url(#eyeOutlineGrad)" stroke-width="5" />
+                                <circle cx="295" cy="298" r="16" fill="#000000" />
+                                <circle cx="288" cy="291" r="6" fill="#ffffff" />
+                            </g>
+
+                            <!-- Cute Smile -->
+                            <path d="M 233,332 Q 250,347 267,332" fill="none" stroke="url(#eyeOutlineGrad)" stroke-width="5" stroke-linecap="round" />
+                        </svg>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+
+    </main>
+
+    <!-- GEOMETRIC & DYNAMIC MOUSE-PROXIMITY STAR CANVAS ANIMATION SCRIPT -->
+    <script>
+        const canvas = document.getElementById('bg-canvas');
+        const ctx = canvas.getContext('2d');
+        const rootyElem = document.getElementById('rooty-target');
+
+        let width = canvas.width = window.innerWidth;
+        let height = canvas.height = window.innerHeight;
+
+        window.addEventListener('resize', () => {
+            width = canvas.width = window.innerWidth;
+            height = canvas.height = window.innerHeight;
+            updateRootyCenter();
+        });
+
+        // Track Rooty's Screen Coordinates
+        let rootyCenter = { x: width * 0.75, y: height * 0.5 };
+        function updateRootyCenter() {
+            if (rootyElem) {
+                const rect = rootyElem.getBoundingClientRect();
+                rootyCenter.x = rect.left + rect.width / 2;
+                rootyCenter.y = rect.top + rect.height / 2;
+            }
+        }
+        updateRootyCenter();
+        setTimeout(updateRootyCenter, 500);
+
+        // Mouse Position Tracking & Proximity Probing
+        let mouse = { x: -1000, y: -1000 };
+        let currentIntensity = 0; // Smooth 0 to 1 scaling factor
+
+        window.addEventListener('mousemove', (e) => {
+            mouse.x = e.clientX;
+            mouse.y = e.clientY;
+        });
+
+        // Ambient Floating Shapes
+        const shapes = [];
+        const numShapes = 28;
+        const types = ['triangle', 'rectangle', 'pentagon'];
+
+        for (let i = 0; i < numShapes; i++) {
+            shapes.push({
+                x: Math.random() * width,
+                y: Math.random() * height,
+                vx: (Math.random() - 0.5) * 0.35,
+                vy: (Math.random() - 0.5) * 0.35,
+                size: Math.random() * 18 + 10,
+                type: types[Math.floor(Math.random() * types.length)],
+                rotation: Math.random() * Math.PI * 2,
+                vRot: (Math.random() - 0.5) * 0.005,
+                strokeColor: 'rgba(107, 114, 128, 0.28)',
+                fillColor: 'rgba(229, 231, 235, 0.20)'
+            });
+        }
+
+        // Dynamic Shining Stars Generation around Rooty
+        const stars = [];
+        const numStars = 65; // Higher star count for enhanced density
+
+        for (let i = 0; i < numStars; i++) {
+            stars.push({
+                baseAngle: Math.random() * Math.PI * 2,
+                angleSpeed: (Math.random() * 0.008 + 0.004) * (Math.random() < 0.5 ? 1 : -1),
+                baseRadius: Math.random() * 120 + 80,  // Dynamic inner/outer orbital range
+                maxRadiusMultiplier: Math.random() * 1.6 + 1.8, // Expands up to ~350px radius
+                size: Math.random() * 7 + 4,
+                points: Math.random() < 0.5 ? 4 : 5,
+                alpha: 0,
+                targetAlpha: Math.random() * 0.7 + 0.3,
+                pulseSpeed: Math.random() * 0.03 + 0.015,
+                pulsePhase: Math.random() * Math.PI * 2,
+                color: Math.random() < 0.5 ? '#38bdf8' : '#818cf8'
+            });
+        }
+
+        // Draw Custom 4-Point or 5-Point Sparkle Star
+        function drawStar(cx, cy, spikes, outerRadius, innerRadius, color, alpha) {
+            let rot = Math.PI / 2 * 3;
+            let x = cx;
+            let y = cy;
+            let step = Math.PI / spikes;
+
+            ctx.save();
+            ctx.beginPath();
+            ctx.moveTo(cx, cy - outerRadius);
+
+            for (let i = 0; i < spikes; i++) {
+                x = cx + Math.cos(rot) * outerRadius;
+                y = cy + Math.sin(rot) * outerRadius;
+                ctx.lineTo(x, y);
+                rot += step;
+
+                x = cx + Math.cos(rot) * innerRadius;
+                y = cy + Math.sin(rot) * innerRadius;
+                ctx.lineTo(x, y);
+                rot += step;
+            }
+
+            ctx.lineTo(cx, cy - outerRadius);
+            ctx.closePath();
+
+            ctx.fillStyle = color;
+            ctx.globalAlpha = alpha;
+            ctx.shadowColor = color;
+            ctx.shadowBlur = 12 * alpha;
+            ctx.fill();
+            ctx.restore();
+        }
+
+        function drawShape(shape) {
+            ctx.save();
+            ctx.translate(shape.x, shape.y);
+            ctx.rotate(shape.rotation);
+            ctx.strokeStyle = shape.strokeColor;
+            ctx.fillStyle = shape.fillColor;
+            ctx.lineWidth = 1.2;
+
+            ctx.beginPath();
+            if (shape.type === 'triangle') {
+                const sides = 3;
+                for (let i = 0; i < sides; i++) {
+                    const angle = (i * 2 * Math.PI) / sides;
+                    const x = shape.size * Math.cos(angle);
+                    const y = shape.size * Math.sin(angle);
+                    if (i === 0) ctx.moveTo(x, y);
+                    else ctx.lineTo(x, y);
+                }
+            } else if (shape.type === 'rectangle') {
+                ctx.rect(-shape.size / 2, -shape.size / 2, shape.size, shape.size);
+            } else if (shape.type === 'pentagon') {
+                const sides = 5;
+                for (let i = 0; i < sides; i++) {
+                    const angle = (i * 2 * Math.PI) / sides;
+                    const x = shape.size * Math.cos(angle);
+                    const y = shape.size * Math.sin(angle);
+                    if (i === 0) ctx.moveTo(x, y);
+                    else ctx.lineTo(x, y);
+                }
+            }
+            ctx.closePath();
+            ctx.fill();
+            ctx.stroke();
+            ctx.restore();
+        }
+
+        function animate() {
+            ctx.clearRect(0, 0, width, height);
+
+            // Calculate Proximity Intensity (0 to 1) towards Rooty
+            const dx = mouse.x - rootyCenter.x;
+            const dy = mouse.y - rootyCenter.y;
+            const dist = Math.sqrt(dx * dx + dy * dy);
+            
+            // Activation threshold within 550px radius of Rooty
+            const maxDist = 550;
+            let targetIntensity = 0;
+            if (dist < maxDist) {
+                targetIntensity = Math.pow(1 - (dist / maxDist), 1.2);
+            }
+
+            // Smooth Interpolation (LERP) for ultra-fluid movement transition
+            currentIntensity += (targetIntensity - currentIntensity) * 0.06;
+
+            // Draw & Update Floating Background Shapes
+            for (let i = 0; i < numShapes; i++) {
+                const shape = shapes[i];
+                drawShape(shape);
+
+                shape.x += shape.vx;
+                shape.y += shape.vy;
+                shape.rotation += shape.vRot;
+
+                if (shape.x < -30) shape.x = width + 30;
+                if (shape.x > width + 30) shape.x = -30;
+                if (shape.y < -30) shape.y = height + 30;
+                if (shape.y > height + 30) shape.y = -30;
+            }
+
+            // Render Dynamic Shining Stars when Mouse approaches Rooty
+            if (currentIntensity > 0.001) {
+                // Background radial aura glow on right side behind Rooty
+                const auraGlow = ctx.createRadialGradient(
+                    rootyCenter.x, rootyCenter.y, 20,
+                    rootyCenter.x, rootyCenter.y, 380 * currentIntensity
+                );
+                auraGlow.addColorStop(0, `rgba(56, 189, 248, ${0.22 * currentIntensity})`);
+                auraGlow.addColorStop(0.5, `rgba(129, 140, 248, ${0.12 * currentIntensity})`);
+                auraGlow.addColorStop(1, 'rgba(255, 255, 255, 0)');
+
+                ctx.save();
+                ctx.fillStyle = auraGlow;
+                ctx.beginPath();
+                ctx.arc(rootyCenter.x, rootyCenter.y, 400 * currentIntensity, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.restore();
+
+                // Animate individual stars with expanding radius and orbital movement
+                for (let i = 0; i < numStars; i++) {
+                    const star = stars[i];
+
+                    // Orbit rotation speed ramps up smoothly with proximity
+                    star.baseAngle += star.angleSpeed * (1 + currentIntensity * 1.5);
+                    star.pulsePhase += star.pulseSpeed;
+
+                    // Expand Radius outward smoothly based on intensity
+                    const currentRadius = star.baseRadius + (star.baseRadius * (star.maxRadiusMultiplier - 1) * currentIntensity);
+
+                    const starX = rootyCenter.x + Math.cos(star.baseAngle) * currentRadius;
+                    const starY = rootyCenter.y + Math.sin(star.baseAngle) * currentRadius * 0.85; // Slight oval perspective
+
+                    // Pulsing twinkle alpha opacity
+                    const pulse = (Math.sin(star.pulsePhase) + 1) / 2;
+                    const calculatedAlpha = star.targetAlpha * currentIntensity * (0.4 + 0.6 * pulse);
+
+                    const outerR = star.size * (0.8 + 0.5 * currentIntensity);
+                    const innerR = outerR * 0.35;
+
+                    drawStar(starX, starY, star.points, outerR, innerR, star.color, calculatedAlpha);
+                }
+            }
+
+            requestAnimationFrame(animate);
+        }
+
+        // Initialize Lucide Icons & Loop
+        lucide.createIcons();
+        animate();
+    </script>
+</body>
+</html>
